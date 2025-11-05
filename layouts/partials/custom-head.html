@@ -1,0 +1,2 @@
+{{ $randomImg := resources.Get "js/random-image.js" | minify | fingerprint }}
+<script src="{{ $randomImg.Permalink }}" defer></script>
