@@ -2,23 +2,23 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Robotics on Simon Gorbet</title>
-    <link>http://localhost:46159/tags/robotics/</link>
+    <link>http://localhost:1313/tags/robotics/</link>
     <description>Recent content in Robotics on Simon Gorbet</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <managingEditor>simon@gorbet.com (Simon Gorbet)</managingEditor>
     <webMaster>simon@gorbet.com (Simon Gorbet)</webMaster>
     <copyright>© 2025 Simon Gorbet</copyright>
-    <lastBuildDate>Tue, 05 Aug 2025 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:46159/tags/robotics/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 05 Aug 2025 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/robotics/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>BananaHand: Open Source Anthropomorphic Robotic Hand</title>
-      <link>http://localhost:46159/projects/banana_hand/</link>
+      <link>http://localhost:1313/projects/banana_hand/</link>
       <pubDate>Tue, 05 Aug 2025 00:00:00 +0000</pubDate>
       <author>simon@gorbet.com (Simon Gorbet)</author>
-      <guid>http://localhost:46159/projects/banana_hand/</guid>
+      <guid>http://localhost:1313/projects/banana_hand/</guid>
       <description>An open-source humanoid hand that combines proportional design, dexterity, tactile sensing, and affordability.</description>
-      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="http://localhost:46159/projects/banana_hand/featured.png" />
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="http://localhost:1313/projects/banana_hand/featured.png" />
     </item>
     
   </channel>
