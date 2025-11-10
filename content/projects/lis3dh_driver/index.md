@@ -7,6 +7,7 @@ tags: ["Rust", "Embedded"]
 
 summary: "Using the typestate design pattern with Rust's compiler to enforce proper hardware configuration."
 description: "How can we use the Typestate design pattern in Rust to help the compiler check hardware configuration."
+weight: 1
 ---
 ## Background
 
