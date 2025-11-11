@@ -62,6 +62,36 @@
     </item>
     
     <item>
+      <title>Art</title>
+      <link>http://localhost:1313/tags/art/</link>
+      <pubDate>Tue, 10 May 2022 00:00:00 +0000</pubDate>
+      <author>simon@gorbet.com (Simon Gorbet)</author>
+      <guid>http://localhost:1313/tags/art/</guid>
+      <description></description>
+      
+    </item>
+    
+    <item>
+      <title>Eagle</title>
+      <link>http://localhost:1313/tags/eagle/</link>
+      <pubDate>Tue, 10 May 2022 00:00:00 +0000</pubDate>
+      <author>simon@gorbet.com (Simon Gorbet)</author>
+      <guid>http://localhost:1313/tags/eagle/</guid>
+      <description></description>
+      
+    </item>
+    
+    <item>
+      <title>Fusion360</title>
+      <link>http://localhost:1313/tags/fusion360/</link>
+      <pubDate>Tue, 10 May 2022 00:00:00 +0000</pubDate>
+      <author>simon@gorbet.com (Simon Gorbet)</author>
+      <guid>http://localhost:1313/tags/fusion360/</guid>
+      <description></description>
+      
+    </item>
+    
+    <item>
       <title>3D Printing</title>
       <link>http://localhost:1313/tags/3d-printing/</link>
       <pubDate>Tue, 05 Mar 2019 00:00:00 +0000</pubDate>
