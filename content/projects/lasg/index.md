@@ -24,7 +24,7 @@ The research group aims can be summarized with the following question:
 ## My Work
 
 This was my first internship outside of high-school and I was very eager to combine my love for art and engineering together, so the role of a technical industrial designer was perfect. The studio uses a handful of actuators that emit light, movement or sound to evoke the feeling of a living being. I was tasked with creating a new sculptural vibration actuator that was cheap and could be placed in the hundreds within sculptors to achieve field like behaviour. The inspiration for the projects was blades of grass blowing in the wind:
-![Grass Blowing in Wind](blowing_grass.gif)
+{{< youtubeLite id="0UizEuyN1as" label="Blowfish-tools demo" params="start=15" >}}
 
 ## Sculpture Actuator - Blade of Grass
 
