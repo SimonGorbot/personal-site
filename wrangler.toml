@@ -4,6 +4,11 @@ compatibility_date = "2025-07-31"
 [build]
 command = "chmod a+x build.sh && ./build.sh"
 
+routes = [
+    { pattern = "simongorbet.com/*" },
+    { pattern = "www.simongorbet.com/*" },
+]
+
 [assets]
 directory = "./public"
 not_found_handling = "404-page"
