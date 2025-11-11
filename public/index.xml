@@ -52,6 +52,16 @@
     </item>
     
     <item>
+      <title>Tech Art @ Living Architecture Systems Group</title>
+      <link>http://localhost:1313/projects/lasg/</link>
+      <pubDate>Tue, 10 May 2022 00:00:00 +0000</pubDate>
+      <author>simon@gorbet.com (Simon Gorbet)</author>
+      <guid>http://localhost:1313/projects/lasg/</guid>
+      <description>Overview of my 4-months working at LASG making tech art for installations around the world.</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="http://localhost:1313/projects/lasg/featured.jpg" />
+    </item>
+    
+    <item>
       <title>About Me</title>
       <link>http://localhost:1313/about/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>

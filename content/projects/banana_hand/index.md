@@ -5,6 +5,8 @@ type: 'project'
 
 tags: ["Rust", "KiCAD", "Robotics", "WIP"]
 
+weight: 5
+
 summary: "An open-source humanoid hand that combines proportional design, dexterity, tactile sensing, and affordability."
 description: "An open-source humanoid hand that combines proportional design, dexterity, tactile sensing, and affordability."
 ---
