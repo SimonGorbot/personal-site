@@ -8,6 +8,8 @@ tags: ["Fusion360", "Eagle", "Art"]
 
 weight: 99
 
+disableImageOptimizationMD: true
+
 summary: "Overview of my 4-months working at LASG making tech art for installations around the world."
 description: "Overview of my 4-months working at LASG making tech art for installations around the world."
 ---
