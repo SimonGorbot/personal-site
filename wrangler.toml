@@ -1,13 +1,13 @@
 name = "personal-site"
 compatibility_date = "2025-07-31"
 
+routes = [
+    { pattern = "simongorbet.com/*", zone_name = "simongorbet.com" },
+    { pattern = "www.simongorbet.com/*", zone_name = "simongorbet.com" },
+]
+
 [build]
 command = "chmod a+x build.sh && ./build.sh"
-
-routes = [
-    { pattern = "simongorbet.com/*" },
-    { pattern = "www.simongorbet.com/*" },
-]
 
 [assets]
 directory = "./public"

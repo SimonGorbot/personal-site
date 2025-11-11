@@ -1,1 +1,25 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Fusion360 on Simon Gorbet</title><link>https://simongorbet.com/tags/fusion360/</link><description>Recent content in Fusion360 on Simon Gorbet</description><generator>Hugo -- gohugo.io</generator><language>en</language><managingEditor>simon@gorbet.com (Simon Gorbet)</managingEditor><webMaster>simon@gorbet.com (Simon Gorbet)</webMaster><copyright>© 2025 Simon Gorbet</copyright><lastBuildDate>Tue, 10 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://simongorbet.com/tags/fusion360/index.xml" rel="self" type="application/rss+xml"/><item><title>Tech Art @ Living Architecture Systems Group</title><link>https://simongorbet.com/projects/lasg/</link><pubDate>Tue, 10 May 2022 00:00:00 +0000</pubDate><author>simon@gorbet.com (Simon Gorbet)</author><guid>https://simongorbet.com/projects/lasg/</guid><description>Overview of my 4-months working at LASG making tech art for installations around the world.</description><media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://simongorbet.com/projects/lasg/featured.jpg"/></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Fusion360 on Simon Gorbet</title>
+    <link>http://localhost:1313/tags/fusion360/</link>
+    <description>Recent content in Fusion360 on Simon Gorbet</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>simon@gorbet.com (Simon Gorbet)</managingEditor>
+    <webMaster>simon@gorbet.com (Simon Gorbet)</webMaster>
+    <copyright>© 2025 Simon Gorbet</copyright>
+    <lastBuildDate>Tue, 10 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/fusion360/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Tech Art @ Living Architecture Systems Group</title>
+      <link>http://localhost:1313/projects/lasg/</link>
+      <pubDate>Tue, 10 May 2022 00:00:00 +0000</pubDate>
+      <author>simon@gorbet.com (Simon Gorbet)</author>
+      <guid>http://localhost:1313/projects/lasg/</guid>
+      <description>Overview of my 4-months working at LASG making tech art for installations around the world.</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="http://localhost:1313/projects/lasg/featured.jpg" />
+    </item>
+    
+  </channel>
+</rss>
