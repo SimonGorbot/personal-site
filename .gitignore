@@ -1,0 +1,12 @@
+# Hugo build artifacts
+/public/
+/resources/_gen/
+.hugo_build.lock
+.hugo_cache/
+hugo_stats.json
+
+# Tooling and OS clutter
+node_modules/
+*.log
+.DS_Store
+Thumbs.db

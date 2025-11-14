@@ -1,0 +1,43 @@
+/* Custom table styling to make cell outlines visible */
+:where(table):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+:where(table th, table td):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border: 1px solid rgba(var(--color-neutral-300), 1);
+  padding: calc(var(--spacing) * 2);
+}
+
+:where(table thead th):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background-color: rgba(var(--color-neutral-50), 1);
+  color: rgba(var(--color-neutral-800), 1);
+}
+
+@media (min-width: 1024px) {
+
+  /* Give single-article content more breathing room next to the TOC */
+  #single_header+section {
+    max-width: none;
+    gap: 2.5rem;
+    align-items: flex-start;
+  }
+
+  #single_header+section>.order-first.lg\:order-last {
+    flex: 0 0 16rem;
+    margin-left: 0;
+    padding-left: 0;
+  }
+
+  #single_header+section>.order-first.lg\:order-last .toc {
+    padding-inline-start: 0;
+  }
+
+  #single_header+section>.min-w-0 {
+    flex: 1 1 auto;
+  }
+
+  #single_header+section .article-content {
+    max-width: 60rem;
+  }
+}

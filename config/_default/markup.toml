@@ -2,19 +2,20 @@
 # These settings are required for the theme to function.
 
 [goldmark]
-  [goldmark.renderer]
-    unsafe = true
+[goldmark.renderer]
+unsafe = true
 
-  [goldmark.extensions]
-    [goldmark.extensions.passthrough]
-      enable = true
-      [goldmark.extensions.passthrough.delimiters]
-        block = [['\[', '\]'], ['$$', '$$']]
-        inline = [['\(', '\)']]
+[goldmark.extensions]
+[goldmark.extensions.passthrough]
+enable = true
+[goldmark.extensions.passthrough.delimiters]
+block = [['\[', '\]'], ['$$', '$$']]
+inline = [['\(', '\)']]
 
 [highlight]
-  noClasses = false
+style = "evergarden"
+noClasses = true
 
 [tableOfContents]
-  startLevel = 2
-  endLevel = 4
+startLevel = 2
+endLevel = 4
