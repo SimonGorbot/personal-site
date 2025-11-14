@@ -20,8 +20,6 @@ During my previous internship at [Fourier](https://fourier.earth), I started my 
 > 2. A way of encoding these states at the type level, such that attempts to use the operations in the wrong state fail to compile,
 > 3. State transition operations (methods or functions) that change the type-level state of objects in addition to, or instead of, changing run-time dynamic state, such that the operations in the previous state are no longer possible.
 >
->
->
 >This is useful because:
 >
 >1. It moves certain types of errors from run-time to compile-time, giving programmers faster feedback.</li>
@@ -33,15 +31,107 @@ During my previous internship at [Fourier](https://fourier.earth), I started my 
 [Adin](https://adinack.dev/)<sub>(the aforementioned Embedded Rust co-worker)</sub>, showed me how we can leverage this design pattern that is so easy to implement in Rust to extend the capabilities of the Rust compiler to validate your hardware configurations.
 My use of the Typestate pattern in the crate is heavily inspired by work done by Adin in his pursuit of creating tools to generate better HALs. Read more about Adin's work [here](https://adinack.dev/blog/better-hals-first-look/).
 
-## Registers
+## Groundwork
 
-Consider if we were to represent the hardware states within register fields as types in the Rust type system. The hardware states in the fields of registers are represented as type-states.
+Let's start by laying out some key terms that we'll use throughout this example and how they are defined...
+
+If we were to represent the hardware states within register fields as types in the Rust type system. The hardware states in the fields of registers are represented as type-states.
 
 Type-states are marker types that directly correspond to hardware states.
 Hardware states are exposed as values of register bit-fields. For any type-state there is going to be a physical value that will be in the physical register. That physical value is referred to as the raw value. For any field, all of the possible hardware states it may in-habit are represented as a variant of an enum named `Variant`. Type-states will implement a trait named `State` which contains a constant `VARIANT` of the type `Variant` and value corresponding to the raw value to achieve the represented hardware state.
 
+We will use a trait named `Entitled` to express inter-bit-field relationships in the type system. This is the secret sauce that allows us coerce the compiler into checking our configurations.
+
+Properties are values that are derived from multiple hardware-states of the sensor but aren't values that are directly written to registers.
+
+## An Example
+
+### Scenario
+
 Consider:
-A device has multiple sensors. Sensor 1 can be enabled or disabled, as well as have its measurement range changed. This chip is very picky though, and if the sensor is disabled, it's range must be set to a specific value otherwise it exhibits undefined behaviour.
+A simple sensor with a single configuration register. The register holds the configuration for the sensor's status, either enabled or disabled, it holds the selection of the sensors measurement range, and lastly it's power mode, either low power or normal power. This chip is very picky though, and if the sensor is disabled, it's range must be set to a specific value otherwise it exhibits undefined behavior. Another quirk of the sensor is that some measurement ranges are only available in specific power modes.
+
+#### Register 1: Address 0x45
+
+| Bit 7  | Bit 6  | Bit 5  | Bit 4   | Bit 3   | Bit 2   | Bit 1   | Bit 0   |
+|--- |--- |--- |---- |---- |---- |---- |---- |
+| -  | -  | -  | -  | Pm  | R1  | R0  | En  |
+
+#### Register 1 Description
+
+| Field         | Description                                                                                     |  
+|   ---         | ---                                                                                             |
+|   Pm          | Power mode select bit. Default value: 0<br>(0: Low power, 1: Normal power)                      |
+|   R[1:0]      | Measurment range select. Default value: 00<br>(see Range Selection table for configurations)    |
+|   En          | Status select bit. Default value: 0<br>(0: Disabled, 1: Enabled)                      |
+
+#### Range Selection
+
+| R1    | R0    | Selected Range                                                                                   | Power Mode Selection               |
+| ---   |---    |---                                                                                               |---                                 |
+|0      |0      |Range Disabled<br>*Must be set when sensor is disabled otherwise exhibits undefined behaviour.*      |Available in all power modes        |
+|0      |1      |Range 1                                                                                           |Available in all power modes        |
+|1      |0      |Range 2                                                                                           |Available in all power modes        |
+|1      |1      |Range 3                                                                                           |Only Available in normal power mode |
+
+### Implementation
+
+We will begin our implementation of the pattern by defining our hardware-states as type-states. Because all of these hardware-states are confined to a single register, we will place them all within a single module. This module is also a convenient place to keep register specific values like it's hardware address. Each type-state is built in a module analogous to the register bit-field, which contains the previously mentioned `State` trait and `Variant` enum.
+
+```rust
+pub mod register_1 {
+    pub const ADDR: u8 = 0x45;
+    
+    pub mod sensor_enable {
+        todo!()
+    }
+
+    pub mod sensor_range {
+        todo!()
+    }
+
+    pub mod power_mode {
+        todo!()
+    }
+}
+```
+
+Let's walk through the creation of our first type-state for the status select bit field.
+
+```rust
+// Create the type-state in a mod named according to the bit-field.
+pub mod sensor_enable {
+    // We can store key field values here
+    // For exampled, address and offset.
+    pub const ADDR: u8 = super::ADDR;
+    pub const OFFSET: u8 = 0;
+
+    // We define our State trait that holds a const of type Variant.
+    pub trait State {
+        const VARIANT: Variant;
+    }
+
+    // We define our Variant enum with variants corresponding to the possible field values.
+    // If we refer back to the register table we see that the possible field values are 0b0 for disabled, and 0b1 for enabled.
+    #[repr(u8)]
+    pub enum Variant {
+        SensorDisabled = 0b0,
+        SensorEnabled = 0b1,
+    }
+
+    // Now we create structs that will implement the State trait with their corresponding variant.
+    pub struct SensorDisabled;
+    pub struct SensorEnabled;
+    impl State for SensorDisabled {
+        const VARIANT: Variant = Variant::SensorDisabled;
+    }
+    impl State for SensorEnabled {
+        const VARIANT: Variant = Variant::SensorEnabled;
+    }
+}
+```
+
+We repeat this process for the other fields in the register and now we end up with the following:
 
  ```rust
  pub mod sensor_1_enable {
