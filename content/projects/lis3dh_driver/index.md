@@ -303,7 +303,7 @@ Now we've expressed all our inter-bit-field relationships to the compiler, it wi
 #### Properties
 
 Properties are values that are derived from multiple hardware-states of the sensor but aren't values that are directly written to registers.
-Continuing on from our scenario, we know the resolution is derived from the sensor measurement range and a new hardware state called `power_mode` that is defined below:
+Continuing on from our scenario, we know the resolution is derived from the sensor measurement `range` and another hardware state `power_mode`.
 
 Then we can define the property like so following a very similar structure to the type-states we previously defined:
 
