@@ -1,5 +1,5 @@
-Hi I'm Simon :wave:, a senior studying *Mechatronics* @ the University of Waterloo.
-I like writing firmware (in rust:crab:) and designing PCBs for robots:robot: and green-tech🌳.
+Hi I'm Simon :wave:, a senior studying *Mechatronics* @ UWaterloo.
+I like writing firmware (in rust :crab:) and designing PCBs for robots :robot: and green-tech 🌳.
 
 I'm currently working on an Open-Source humanoid hand 🦾
 
