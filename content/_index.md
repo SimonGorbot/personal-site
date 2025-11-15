@@ -7,6 +7,8 @@ I'm currently working on an Open-Source humanoid hand 🦾
 
 ### Featured Projects
 
+{{<list title="Featured Projects" limit=3 where="Tags" value="[Rust]">}}
+
 {{< article link="/projects/lis3dh_driver/" showSummary=true compactSummary=true >}}
 <br>
 {{< article link="/projects/siterm/" showSummary=true compactSummary=true >}}
