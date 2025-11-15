@@ -505,7 +505,7 @@ fn main() {
 
 Output:
 
-```
+```text
 Bus write: 0b1111 to 0x45
 Sensor resolution: 16
 ```
@@ -526,7 +526,7 @@ fn main() {
 
 Output:
 
-```
+```text
 error[E0277]: the trait bound `Range3: Entitled<LowPower>` is not satisfied
    --> src/main.rs:276:16
     |
