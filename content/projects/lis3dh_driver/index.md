@@ -9,6 +9,10 @@ summary: "Using the type-state design pattern with Rust's compiler to enforce pr
 description: "How can we use the type-state design pattern in Rust to help the compiler check hardware configuration."
 weight: 1
 ---
+## TL;DR
+
+This is a fairly long post with a lot of code. If you don't have much time, feel free skip to the [results](#results) and if you find it interesting take a look through the whole post.
+
 ## Background
 
 During my previous internship at [Fourier](https://fourier.earth), I started my Embedded Rust development journey. I had previously written small amounts of Rust, but I would by no means say I knew the language at the time. One of Fourier's embedded systems engineers is a very passionate Embedded Rust developer. He is the one who introduced to the **type-state** pattern.
