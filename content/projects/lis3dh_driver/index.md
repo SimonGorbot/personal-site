@@ -15,10 +15,9 @@ This is a fairly long post with a lot of code. If you don't have much time, feel
 
 ## Background
 
-During my previous internship at [Fourier](https://fourier.earth), I started my Embedded Rust development journey. I had previously written small amounts of Rust, but I would by no means say I knew the language at the time. One of Fourier's embedded systems engineers is a very passionate Embedded Rust developer. He is the one who introduced to the **type-state** pattern.
+During my previous internship at [Fourier](https://fourier.earth), I started my Embedded Rust development journey. I had previously written small amounts of Rust, but I would by no means say I knew the language at the time. One of Fourier's embedded systems engineers is a very passionate Embedded Rust developer. He is the one who introduced me to the **type-state** pattern.
 
->The type-state pattern is an API design pattern that encodes information about an object’s run-time state in its compile-time type. In particular, >an API using the type-state pattern will have:
->
+>The type-state pattern is an API design pattern that encodes information about an object’s run-time state in its compile-time type. In particular, an API using the type-state pattern will have:
 >
 > 1. Operations on an object (such as methods or functions) that are only available when the object is in certain states,</li>
 > 2. A way of encoding these states at the type level, such that attempts to use the operations in the wrong state fail to compile,
@@ -32,17 +31,17 @@ During my previous internship at [Fourier](https://fourier.earth), I started my 
 >
 >This great explanation is taken from [Cliffle's](https://cliffle.com/) blog post ["The Typestate Pattern in Rust"](https://cliffle.com/blog/rust-type-state/)
 
-[Adin](https://adinack.dev/)<sub>(the aforementioned Embedded Rust co-worker)</sub>, showed me how we can leverage this design pattern that is so easy to implement in Rust to extend the capabilities of the Rust compiler to validate your hardware configurations.
+[Adin](https://adinack.dev/)<sub>(the aforementioned Embedded Rust co-worker)</sub>, showed me how we can leverage this design pattern that is so easy to implement in Rust to extend the capabilities of the Rust compiler to validate hardware configurations.
 My use of the type-state pattern in the crate is heavily inspired by work done by Adin in his pursuit of creating tools to generate better HALs. Read more about Adin's work [here](https://adinack.dev/blog/better-hals-first-look/).
 
 ## Groundwork
 
 Let's start by laying out some key terms that we'll use throughout this example and how they are defined...
 
-If we were to represent the hardware states within register fields as types in the Rust type system. The hardware states in the fields of registers are represented as type-states.
+All this starts with the idea of representing the hardware states within register fields as types in the Rust type system. This representation of hardware states in the fields of registers as Rust types are named type-states.
 
 Type-states are marker types that directly correspond to hardware states.
-Hardware states are exposed as values of register bit-fields. For any type-state there is going to be a physical value that will be in the physical register. That physical value is referred to as the raw value. For any field, all of the possible hardware states it may in-habit are represented as a variant of an enum named `Variant`. Type-states will implement a trait named `State` which contains a constant `VARIANT` of the type `Variant` and value corresponding to the raw value to achieve the represented hardware state.
+Hardware states are exposed as values of register bit-fields. For any type-state there is going to be a specific value that will be in the respective physical register field. That physical value is referred to as the raw value. For any field, all of the possible hardware states it may in-habit are represented as a variant of an enum named `Variant`. Type-states will implement a trait named `State` which contains a constant `VARIANT` of the type `Variant` and value corresponding to the raw value to achieve the represented hardware state.
 
 We will use a trait named `Entitled` to express inter-bit-field relationships in the type system. This is the secret sauce that allows us coerce the compiler into checking our configurations.
 
@@ -71,7 +70,7 @@ A simple sensor with a single configuration register. The register holds the con
 | Field         | Description                                                                                     |  
 |   ---         | ---                                                                                             |
 |   Pm          | Power mode select bit. Default value: 0<br>(0: Low power, 1: Normal power)                      |
-|   R[1:0]      | Measurment range select. Default value: 00<br>(see Range Selection table for configurations)    |
+|   R[1:0]      | Measurement range select. Default value: 00<br>(see Range Selection table for configurations)    |
 |   En          | Status select bit. Default value: 0<br>(0: Disabled, 1: Enabled)                      |
 
 #### Range Selection
@@ -97,7 +96,7 @@ A simple sensor with a single configuration register. The register holds the con
 
 #### Our Type-States
 
-We will begin our implementation of the pattern by defining our hardware-states as type-states. Because all of these hardware-states are confined to a single register, we will place them all within a single module. This module is also a convenient place to keep register specific values like it's hardware address. Each type-state is built in a module analogous to the register bit-field, which contains the previously mentioned `State` trait and `Variant` enum.
+We will begin our implementation of the pattern by defining our hardware states as type-states. Because all of these hardware states are confined to a single register, we will place them all within a single module. This module is also a convenient place to keep register specific values like it's hardware address. Each type-state is built in a module analogous to the register bit-field, which contains the previously mentioned `State` trait and `Variant` enum.
 
 ```rust
 pub mod register_1 {
@@ -249,7 +248,7 @@ We repeat this process for the other fields in the register and now we end up wi
 }
 ```
 
-Lastly we provide need to provide a way to access these type-states as they would appear in the register, as bits. To do so we add the straight forward associated function `render_as_bytes`.
+Lastly we need to provide a way to access these type-states as they would appear in the register, as bits. To do so we add the straight forward associated function `render_as_bytes`.
 
 ```rust
 pub mod register_1{
@@ -271,7 +270,7 @@ pub mod register_1{
 #### Expressing Entitlements
 
 Now that we've created our type-states, we need to express their relationship with each other using the `Entitled` trait.
-From the example, if `range` can only be set to one of the options: {`Range1`, `Range2`, and `Range3`}, if `status` is set to `Enabled`, then one could say that the Type-States `Range1`, `Range2`, and `Range3` of `range` are `Entitled` to the Type-State `Enabled` of `status`.
+From the example, if `range` can only be set to one of the options: {`Range1`, `Range2`, and `Range3`}, if `status` is set to `Enabled`, then one could say that the type-states `Range1`, `Range2`, and `Range3` of `range` are `Entitled` to the type-state `Enabled` of `status`.
 The mandatory hardware state of the sensor range bit-field when the sensor is disabled can be enforced by the compiler using Entitlements.
 In code this would look like:
 
