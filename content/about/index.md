@@ -3,15 +3,21 @@ title: "About Me"
 description: "Learn a little bit more about who I am."
 ---
 
+{{< columns >}}
+
 Hi I'm Simon, a senior studying Mechatronics Engineering at the University of Waterloo.
 
 I love working with and designing embedded systems, both the firmware and hardware.  
 
 In my free time I like to play volleyball, climb, drink a good coffee, spend time with my cat, and enjoy the great outdoors!
 
-<img id="random-about-image" alt="About Me" />
+{{< column >}}
 
-*refresh for a new random portrait*
+  <img id="random-about-image" alt="About Me" />
+
+  *refresh for a new random portrait*
+
+{{< endcolumns >}}
 
 <!-- Random Portrait Script -->
 <script>

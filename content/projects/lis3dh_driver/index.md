@@ -9,6 +9,10 @@ summary: "Using the type-state design pattern with Rust's compiler to enforce pr
 description: "How can we use the type-state design pattern in Rust to help the compiler check hardware configuration."
 weight: 1
 ---
+## TL;DR
+
+This is a fairly long post with a lot of code. If you don't have much time, feel free skip to the [results](#results) and if you find it interesting take a look through the whole post.
+
 ## Background
 
 During my previous internship at [Fourier](https://fourier.earth), I started my Embedded Rust development journey. I had previously written small amounts of Rust, but I would by no means say I knew the language at the time. One of Fourier's embedded systems engineers is a very passionate Embedded Rust developer. He is the one who introduced to the **type-state** pattern.
@@ -303,7 +307,7 @@ Now we've expressed all our inter-bit-field relationships to the compiler, it wi
 #### Properties
 
 Properties are values that are derived from multiple hardware-states of the sensor but aren't values that are directly written to registers.
-Continuing on from our scenario, we know the resolution is derived from the sensor measurement range and a new hardware state called `power_mode` that is defined below:
+Continuing on from our scenario, we know the resolution is derived from the sensor measurement `range` and another hardware state `power_mode`.
 
 Then we can define the property like so following a very similar structure to the type-states we previously defined:
 
@@ -505,7 +509,7 @@ fn main() {
 
 Output:
 
-```
+```text
 Bus write: 0b1111 to 0x45
 Sensor resolution: 16
 ```
@@ -526,7 +530,7 @@ fn main() {
 
 Output:
 
-```
+```text
 error[E0277]: the trait bound `Range3: Entitled<LowPower>` is not satisfied
    --> src/main.rs:276:16
     |
