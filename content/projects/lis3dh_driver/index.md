@@ -29,7 +29,7 @@ During my previous internship at [Fourier](https://fourier.earth), I started my 
 >2. It interacts nicely with IDEs, which can avoid suggesting operations that are illegal in a certain state.</li>
 >3. It can eliminate run-time checks, making code faster/smaller.
 >
->This great explanation is taken from [Cliffle's](https://cliffle.com/) blog post ["The Typestate Pattern in Rust"](https://cliffle.com/blog/rust-type-state/)
+>This great explanation is taken from [Cliffle's](https://cliffle.com/) blog post ["The Typestate Pattern in Rust"](https://cliffle.com/blog/rust-typestate/)
 
 [Adin](https://adinack.dev/)<sub>(the aforementioned Embedded Rust co-worker)</sub>, showed me how we can leverage this design pattern that is so easy to implement in Rust to extend the capabilities of the Rust compiler to validate hardware configurations.
 My use of the type-state pattern in the crate is heavily inspired by work done by Adin in his pursuit of creating tools to generate better HALs. Read more about Adin's work [here](https://adinack.dev/blog/better-hals-first-look/).
