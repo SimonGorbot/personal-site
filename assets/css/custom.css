@@ -14,6 +14,19 @@
   color: rgba(var(--color-neutral-800), 1);
 }
 
+/* Style level-5 headings like level-4 but keep them unbolded */
+:where(h5):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  color: var(--tw-prose-headings);
+  font-weight: 400;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  line-height: 1.5;
+}
+
+:where(h5 + *):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  margin-top: 0;
+}
+
 @media (min-width: 1024px) {
 
   /* Give single-article content more breathing room next to the TOC */
