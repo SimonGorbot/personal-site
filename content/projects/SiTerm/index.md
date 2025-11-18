@@ -21,40 +21,80 @@ This is still very much so a work in progress. I'm really trying to find time to
 - The name of the project comes from an abbreviated form of **S**erial **I**nterface **Term**inal. It's also the first two letters of my name **Si**mon **Term**inal.
 - There's a lot of unused code in the project currently because I started from a template. I'm in the process of trimming all of it out.
 
-# Command List
+## Command List
 
-## I2C
+All commands follow the general format: `protocol action payload`. Payloads are action specific depending on the command you are writting.
 
-| Description                     | Protocol  | Action  | Payload                                                                                   | Example                         | Complete |
-|---------------------------------|---------- |-------- |-------------------------------------------------------------------------------------------|---------------------------------|----------|
-|single byte read                 |i2c        |r        |device_address register_address 1                                                          |`i2c r 0x1A 0x0F 1`              | ✅       |
-|single byte read                 |i2c        |w        |device_address register_address value_to_write                                             |`i2c r 0x1A 0x0F 1`              |          |
-|batch read                       |i2c        |r        |device_address starting_register_address num_reads                                         |`i2c r 0x1A 0x0F 10`             |          |
-|batch write                      |i2c        |w        |device_address starting_register_address value_to_write1 value_to_write2 value_to_write3   |`i2c r 0x1A 0x0F 0x01 0x02 0x03` |          |
+### I2C
 
-## I2C
+#### Leader
 
-- [x] read
-- [ ] write
-- [ ] batch read
-- [ ] batch write
+##### Single Byte Read
 
-## SPI
+ Protocol  | Action  | Payload                            | Example                        | Complete |
+---------- |-------- |------------------------------------|--------------------------------|----------|
+i2c        |r        |device_address register_address 1   |`i2c r 0x1A 0x0F 1`             | ✅       |
 
-- [ ] read
-- [ ] write
-- [ ] batch read
-- [ ] batch write
+##### Single Byte Write
 
-## UART
+ Protocol  | Action  | Payload                                         | Example                         | Complete |
+---------- |-------- |-------------------------------------------------|---------------------------------|----------|
+i2c        |w        |device_address register_address value_to_write   |`i2c r 0x1A 0x0F 0xFF`           | 🚧       |
 
-- [ ] send string
-- [ ] send bytes
-- [ ] read num bytes
-- [ ] read until byte
+##### Batch Read
 
-## PWM
+ Protocol | Action  | Payload                                          | Example              | Complete |
+----------|---------|--------------------------------------------------|----------------------|----------|
+i2c       |r        |device_address starting_register_address num_reads|`i2c r 0x1A 0x0F 3`   |🚧        |
 
-- [ ] set duty cycle
+##### Batch Write
+
+ Protocol | Action  | Payload                                                                                | Example                           | Complete |
+----------|---------|----------------------------------------------------------------------------------------|-----------------------------------|----------|
+i2c       |r        |device_address starting_register_address value_to_write_1 ... value_to_write_n|`i2c r 0x1A 0x0F 0x0A 0x0B 0x0C`   |🚧        |
+
+### SPI
+
+#### Leader
+
+##### Single Byte Read
+
+*coming soon*
+
+##### Single Byte Write
+
+*coming soon*
+
+##### Batch Read
+
+*coming soon*
+
+##### Batch Write
+
+*coming soon*
+
+### UART
+
+#### Send String
+
+*coming soon*
+
+#### Send Bytes
+
+*coming soon*
+
+#### Read Number Bytes
+
+*coming soon*
+
+#### Read Until Byte/Bytes
+
+*coming soon*
+
+### PWM
+
+#### Set Duty Cycle
+
+*coming soon*
 
  {{<github repo="SimonGorbot/SiTerm" showThumbnail=false >}}
