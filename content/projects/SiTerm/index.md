@@ -53,6 +53,12 @@ i2c       |r        |device_address starting_register_address num_reads|`i2c r 0
 ----------|---------|----------------------------------------------------------------------------------------|-----------------------------------|----------|
 i2c       |r        |device_address starting_register_address value_to_write_1 ... value_to_write_n|`i2c r 0x1A 0x0F 0x0A 0x0B 0x0C`   |🚧        |
 
+#### Follower
+
+##### Listen
+
+*coming soon*
+
 ### SPI
 
 #### Leader
