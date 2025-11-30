@@ -53,14 +53,14 @@
 #  weight = 30
 
 [[main]]
-name = "About"
-pageRef = "about"
-weight = 10
+name = "WhoAmI"
+pageRef = "WhoAmI"
+weight = 20
 
 [[main]]
 name = "Projects"
 pageRef = "projects"
-weight = 20
+weight = 10
 
 [[main]]
 name = "Resume"

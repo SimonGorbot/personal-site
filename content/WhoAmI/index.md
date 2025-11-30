@@ -1,5 +1,5 @@
 ---
-title: "About Me"
+title: "WhoAmI"
 description: "Learn a little bit more about who I am."
 ---
 
