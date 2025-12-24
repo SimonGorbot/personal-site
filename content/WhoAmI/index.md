@@ -23,15 +23,15 @@ In my free time I like to play volleyball, climb, drink a good coffee, spend tim
 <script>
   // List of images with weights
   const images = [
-    { src: "/about/gallery_me/01_yosemite.jpg", weight: 4 },
-    { src: "/about/gallery_me/02_zion.jpeg", weight: 2 },
-    { src: "/about/gallery_me/03_climb.jpeg", weight: 2 },
-    { src: "/about/gallery_me/04_iceland.jpeg", weight: 1 },
-    { src: "/about/gallery_me/05_wheat.jpeg", weight: 2 },
-    { src: "/about/gallery_me/06_beach.jpeg", weight: 2 },
-    { src: "/about/gallery_me/07_redlight.jpeg", weight: 2 },
-    { src: "/about/gallery_me/08_hammock.jpg", weight: 2 },
-    { src: "/about/gallery_me/09_yosem_selfie.jpg", weight: 2 },
+    { src: "/WhoAmI/gallery_me/01_yosemite.jpg", weight: 4 },
+    { src: "/WhoAmI/gallery_me/02_zion.jpeg", weight: 2 },
+    { src: "/WhoAmI/gallery_me/03_climb.jpeg", weight: 2 },
+    { src: "/WhoAmI/gallery_me/04_iceland.jpeg", weight: 1 },
+    { src: "/WhoAmI/gallery_me/05_wheat.jpeg", weight: 2 },
+    { src: "/WhoAmI/gallery_me/06_beach.jpeg", weight: 2 },
+    { src: "/WhoAmI/gallery_me/07_redlight.jpeg", weight: 2 },
+    { src: "/WhoAmI/gallery_me/08_hammock.jpg", weight: 2 },
+    { src: "/WhoAmI/gallery_me/09_yosem_selfie.jpg", weight: 2 },
   ];
 
   // Helper: weighted random choice
