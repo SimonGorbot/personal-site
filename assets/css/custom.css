@@ -14,6 +14,11 @@
   color: rgba(var(--color-neutral-800), 1);
 }
 
+/* Soften the light-mode homepage overlay without touching the theme files */
+html:not(.dark) #background-image+div+div {
+  opacity: 0.35 !important;
+}
+
 /* Style level-5 headings like level-4 but keep them unbolded */
 :where(h5):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
   color: var(--tw-prose-headings);
