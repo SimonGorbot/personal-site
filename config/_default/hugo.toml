@@ -38,6 +38,9 @@ enableEmoji = true
 [outputs]
   home = ["HTML", "RSS", "JSON"]
 
+[security.funcs]
+  getenv = ['^HUGO_', '^CI$', '^GITHUB_TOKEN$']
+
 [related]
   threshold = 0
   toLower = false

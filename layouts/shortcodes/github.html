@@ -1,0 +1,110 @@
+{{ $id := delimit (slice "github" (partial "functions/uid.html" .)) "-" }}
+{{- $repo := .Get "repo" -}}
+{{- $githubURL := print "https://api.github.com/repos/" $repo -}}
+{{- $githubThumbnailURL := print "https://opengraph.githubassets.com/0/" $repo -}}
+{{- $showThumbnail := .Get "showThumbnail" | default true -}}
+{{- $repoColors := .Site.Data.repoColors -}}
+{{- $githubToken := getenv "GITHUB_TOKEN" | default "" -}}
+{{- $githubHeaders := dict
+  "Accept" "application/vnd.github+json"
+  "User-Agent" "hugo-github-shortcode"
+  "X-GitHub-Api-Version" "2022-11-28"
+-}}
+{{- if $githubToken -}}
+  {{- $githubHeaders = merge $githubHeaders (dict "Authorization" (printf "Bearer %s" $githubToken)) -}}
+{{- end -}}
+{{- $githubRemoteOpts := dict "headers" $githubHeaders -}}
+{{- if not $repo -}}
+  {{- warnf "github shortcode: missing repo param: %s" .Position -}}
+{{- else -}}
+  {{- $fallbackDesc := .Get "description" | default "Repository details unavailable at build time." -}}
+  {{- $githubData := dict
+    "html_url" (print "https://github.com/" $repo)
+    "full_name" $repo
+    "description" $fallbackDesc
+    "language" ""
+    "stargazers_count" ""
+    "forks" ""
+  -}}
+  {{- with try (resources.GetRemote $githubURL $githubRemoteOpts) -}}
+    {{- with .Err -}}
+      {{- warnf "github shortcode: failed to fetch remote resource from %q: %v (%s)" $githubURL . $.Position -}}
+      {{- if and (not $githubToken) (in (printf "%v" .) "Forbidden") -}}
+        {{- warnf "github shortcode: received Forbidden without GITHUB_TOKEN. Set GITHUB_TOKEN in build env to reduce API throttling failures: %s" $.Position -}}
+      {{- end -}}
+    {{- else with .Value -}}
+      {{- $githubData = merge $githubData (. | transform.Unmarshal) -}}
+    {{- else -}}
+      {{- warnf "github shortcode: unable to get remote resource from %q (no error returned): %s" $githubURL $.Position -}}
+    {{- end -}}
+  {{- end -}}
+
+  <div class="github-card-wrapper">
+    <a id="{{ $id }}" target="_blank" href="{{ $githubData.html_url }}" class="cursor-pointer">
+      <div
+        class="w-full md:w-auto p-0 m-0 border border-neutral-200 dark:border-neutral-700 border rounded-md shadow-2xl">
+        {{- if $showThumbnail -}}
+          <div class="w-full nozoom">
+            <img
+              src="{{ $githubThumbnailURL }}"
+              alt="GitHub Repository Thumbnail"
+              class="nozoom mt-0 mb-0 w-full h-full object-cover">
+          </div>
+        {{- end -}}
+
+
+        <div class="w-full md:w-auto pt-3 p-5">
+          <div class="flex items-center">
+            <span class="text-2xl text-neutral-800 dark:text-neutral me-2">
+              {{ partial "icon.html" "github" }}
+            </span>
+            <div
+              id="{{ $id }}-full_name"
+              class="m-0 font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral">
+              {{ $githubData.full_name | markdownify }}
+            </div>
+          </div>
+
+          <p id="{{ $id }}-description" class="m-0 mt-2 text-md text-neutral-800 dark:text-neutral">
+            {{ $githubData.description | markdownify }}
+          </p>
+
+          <div class="m-0 mt-2 flex items-center">
+            {{ $language := cond $githubData.language $githubData.language "default" }}
+            {{ $currentLangs := $.Page.Store.Get "repoCardLanguages" | default slice }}
+            {{ $.Page.Store.Set "repoCardLanguages" ($currentLangs | append $language) }}
+            <span
+              class="mr-1 inline-block h-3 w-3 rounded-full language-dot"
+              data-language="{{ $language }}"></span>
+            <div class="m-0 mr-5 text-md text-neutral-800 dark:text-neutral">
+              {{ if $githubData.language }}{{ $githubData.language }}{{ else }}null{{ end }}
+            </div>
+
+            <span class="text-md mr-1 text-neutral-800 dark:text-neutral">
+              {{ partial "icon.html" "star" }}
+            </span>
+            <div id="{{ $id }}-stargazers" class="m-0 mr-5 text-md text-neutral-800 dark:text-neutral">
+              {{ $githubData.stargazers_count }}
+            </div>
+
+            <span class="text-md mr-1 text-neutral-800 dark:text-neutral">
+              {{ partial "icon.html" "fork" }}
+            </span>
+            <div id="{{ $id }}-forks" class="m-0 mr-5 text-md text-neutral-800 dark:text-neutral">
+              {{ $githubData.forks }}
+            </div>
+          </div>
+        </div>
+      </div>
+      {{ $fetchRepo := resources.Get "js/fetch-repo.js" }}
+      {{ $fetchRepo = $fetchRepo | resources.Minify | resources.Fingerprint ($.Site.Params.fingerprintAlgorithm | default "sha512") }}
+      <script
+        async
+        type="text/javascript"
+        src="{{ $fetchRepo.RelPermalink }}"
+        integrity="{{ $fetchRepo.Data.Integrity }}"
+        data-repo-url="{{ $githubURL }}"
+        data-repo-id="{{ $id }}"></script>
+    </a>
+  </div>
+{{- end -}}
