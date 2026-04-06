@@ -4,6 +4,16 @@
 {{- $githubThumbnailURL := print "https://opengraph.githubassets.com/0/" $repo -}}
 {{- $showThumbnail := .Get "showThumbnail" | default true -}}
 {{- $repoColors := .Site.Data.repoColors -}}
+{{- $githubToken := getenv "GITHUB_TOKEN" | default "" -}}
+{{- $githubHeaders := dict
+  "Accept" "application/vnd.github+json"
+  "User-Agent" "hugo-github-shortcode"
+  "X-GitHub-Api-Version" "2022-11-28"
+-}}
+{{- if $githubToken -}}
+  {{- $githubHeaders = merge $githubHeaders (dict "Authorization" (printf "Bearer %s" $githubToken)) -}}
+{{- end -}}
+{{- $githubRemoteOpts := dict "headers" $githubHeaders -}}
 {{- if not $repo -}}
   {{- warnf "github shortcode: missing repo param: %s" .Position -}}
 {{- else -}}
@@ -16,9 +26,12 @@
     "stargazers_count" ""
     "forks" ""
   -}}
-  {{- with try (resources.GetRemote $githubURL) -}}
+  {{- with try (resources.GetRemote $githubURL $githubRemoteOpts) -}}
     {{- with .Err -}}
       {{- warnf "github shortcode: failed to fetch remote resource from %q: %v (%s)" $githubURL . $.Position -}}
+      {{- if and (not $githubToken) (in (printf "%v" .) "Forbidden") -}}
+        {{- warnf "github shortcode: received Forbidden without GITHUB_TOKEN. Set GITHUB_TOKEN in build env to reduce API throttling failures: %s" $.Position -}}
+      {{- end -}}
     {{- else with .Value -}}
       {{- $githubData = merge $githubData (. | transform.Unmarshal) -}}
     {{- else -}}
