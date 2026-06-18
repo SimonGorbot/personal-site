@@ -5,11 +5,11 @@ type: 'project'
 
 tags: ["Rust", "Embedded", "RP2040"]
 
-summary: "Describe a register-map in JSON, add CSV for dynamic data, generate firmware, and flash to emulate as a real hardware target on an I2C bus."
-description: "Describe a register-map in JSON, add CSV for dynamic data, generate firmware, and flash to emulate as a real hardware target on an I2C bus."
+summary: "Describe a register-map in JSON, add CSV for dynamic data, generate firmware, and flash to emulate as a real hardware target on an I²C bus."
+description: "Describe a register-map in JSON, add CSV for dynamic data, generate firmware, and flash to emulate as a real hardware target on an I²C bus."
 weight: 2
 ---
-MimIIC is a configurable I²C peripheral emulator built around the RP2040. It allows you to describe a register-mapped I²C device in a JSON file, optionally attach CSV data to registers that should change over time, generate firmware tables from that model, and then run the emulator as a real hardware target on an I²C bus.
+MimIIC is a configurable I²C peripheral emulator built around the RP2040. Describe a register-mapped I²C device in a JSON file, optionally attach CSV data to registers that should change over time, generate firmware tables from that model, and then run the emulator as a real hardware target on an I²C bus.
 
 The motivation came from a problem I have run into several times in embedded development: firmware often needs to be written and tested before the real peripheral hardware is available, stable, or easy to automate. Software mocks are useful, but they skip over the actual electrical and protocol-level behaviour of the bus. MimIIC keeps the real I²C integration path in the loop while making the peripheral side configurable and repeatable.
 
@@ -129,7 +129,7 @@ This means MimIIC works well for slower-changing sensor values, status registers
 
 The most useful design choice was moving as much structure as possible to build time. The RP2040 firmware does not need to parse JSON, allocate dynamic structures, or decide whether the model is valid. The generator catches invalid addresses, duplicate registers, malformed CSV files, invalid access rules, too many host-stream registers, and embedded-data memory budget violations before firmware is built.
 
-That gives the runtime a simpler job: serve a known-good register model deterministically.
+This gives the runtime a simpler job: serve a known-good register model deterministically.
 
 The tradeoff is that changing the register map requires regenerating and reflashing firmware. For this project, that was acceptable because the goal was repeatable hardware-in-the-loop validation, not live reconfiguration of arbitrary device models. Runtime editability could be added later, but it would increase protocol complexity and make the embedded state harder to reason about.
 
@@ -139,7 +139,7 @@ MimIIC is not a full behavioural model of complex I²C peripherals yet. It emula
 
 First, explicit NACK scripting is not implemented. Many real devices NACK during startup delays, busy windows, invalid accesses, or fault states. Being able to configure state-dependent NACK behaviour would make MimIIC much better for driver edge-case testing.
 
-Second, inter-register behaviour is limited. Real devices often have coupled semantics: writing a control register may change output scaling, clear an interrupt flag, affect a data-ready bit, or alter what a later read returns. A trigger/action rule layer for register interactions would make the emulator much more realistic.
+Real devices often have linked register behavior: writing to one register may change output scaling, clear an interrupt flag, affect a data-ready bit, or alter what a later read returns. A trigger/action rule layer for register interactions would make the emulator much more realistic.
 
 Other useful improvements would include automated latency and jitter characterization, broader master-device test coverage, and optional YAML support for users who prefer a more human-editable model format.
 
@@ -149,6 +149,9 @@ MimIIC shows that a small, low-cost microcontroller can become a practical hardw
 
 The end result is a repeatable test target that still exercises the real bus-facing firmware path. For driver bring-up, sensor-data replay, and controlled register-level testing, that is the part that matters.
 
-## Repo
+## Repo & Report
 
+I completed this self-directed project as a part of an independent project course (ECE499) in which I am proud to say I received a grade of 100%. The detailed submitted report covering design decisions, test cases, detailed examples, ect. can be found [here](https://github.com/SimonGorbot/mimIIC/blob/main/final-report.pdf).
+
+And all code can be found in the repo below:
  {{<github repo="SimonGorbot/mimiic" showThumbnail=false >}}
