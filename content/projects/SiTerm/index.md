@@ -7,7 +7,7 @@ tags: ["Rust", "Embedded", "WIP"]
 
 summary: "A TUI+Adapter that allows you to interface your laptop via USB to downstream systems and transfer serial messages using I2C, SPI, and UART. "
 description: "A TUI+Adapter that allows you to interface your laptop via USB to downstream systems and transfer serial messages using I2C, SPI, and UART. "
-weight: 2
+weight: 5
 ---
 
 ## Project Summary
