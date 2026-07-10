@@ -1,0 +1,223 @@
+{{ $toc := .TableOfContents | emojify }}
+{{ if not (in $toc "<nav") }}
+  {{ $toc = "<nav id=\"TableOfContents\"></nav>" }}
+{{ end }}
+<details
+  open
+  id="TOCView"
+  class="toc-right mt-0 overflow-y-auto overscroll-contain scrollbar-thin scrollbar-track-neutral-200 scrollbar-thumb-neutral-400 dark:scrollbar-track-neutral-800 dark:scrollbar-thumb-neutral-600 rounded-lg -ms-5 ps-5 pe-2 hidden lg:block">
+  <summary
+    class="block py-1 text-lg font-semibold cursor-pointer bg-neutral-100 text-neutral-800 -ms-5 ps-5 dark:bg-neutral-700 dark:text-neutral-100 lg:hidden">
+    {{ i18n "article.table_of_contents" }}
+  </summary>
+  <div
+    class="min-w-[220px] py-2 border-dotted border-s-1 -ms-5 ps-5 dark:border-neutral-600">
+    {{ $toc | safeHTML }}
+  </div>
+</details>
+<details class="toc-inside mt-0 overflow-hidden rounded-lg -ms-5 ps-5 lg:hidden">
+  <summary
+    class="py-1 text-lg font-semibold cursor-pointer bg-neutral-100 text-neutral-800 -ms-5 ps-5 dark:bg-neutral-700 dark:text-neutral-100 lg:hidden">
+    {{ i18n "article.table_of_contents" }}
+  </summary>
+  <div
+    class="py-2 border-dotted border-neutral-300 border-s-1 -ms-5 ps-5 dark:border-neutral-600">
+    {{ $toc | safeHTML }}
+  </div>
+</details>
+
+{{ if .Site.Params.smartTOC }}
+<script>
+  (function () {
+    'use strict'
+
+    const SCROLL_OFFSET_RATIO = 0.33
+    const TOC_SELECTOR = '#TableOfContents'
+    const TOC_NAV_SELECTOR = 'nav#TableOfContents'
+    const ANCHOR_SELECTOR = '.anchor'
+    const TOC_LINK_SELECTOR = 'a[href^="#"]'
+    const NESTED_LIST_SELECTOR = 'li ul'
+    const ARTICLE_HEADING_SELECTOR = '.article-content h1, .article-content h2, .article-content h3, .article-content h4, .article-content h5, .article-content h6'
+    const ACTIVE_CLASS = 'active'
+
+    function getHeadingAnchor(heading) {
+      return [...heading.children].find(child => child.classList?.contains('anchor')) || null
+    }
+
+    function getHeadingText(heading) {
+      const clone = heading.cloneNode(true)
+      clone.querySelectorAll('.anchor, span.select-none').forEach(el => el.remove())
+      return clone.textContent.trim()
+    }
+
+    function collectArticleHeadings() {
+      return [...document.querySelectorAll(ARTICLE_HEADING_SELECTOR)]
+        .map(heading => {
+          const anchor = getHeadingAnchor(heading)
+          if (!anchor?.id) return null
+
+          return {
+            id: anchor.id,
+            level: Number.parseInt(heading.tagName.substring(1), 10),
+            text: getHeadingText(heading)
+          }
+        })
+        .filter(Boolean)
+    }
+
+    function buildTOCList(headings) {
+      const root = document.createElement('ul')
+      if (!headings.length) return root
+
+      const minLevel = Math.min(...headings.map(heading => heading.level))
+      const ulByLevel = new Map([[1, root]])
+
+      headings.forEach(heading => {
+        let level = heading.level - minLevel + 1
+        while (level > 1 && !ulByLevel.has(level - 1)) {
+          level -= 1
+        }
+
+        for (const existingLevel of [...ulByLevel.keys()]) {
+          if (existingLevel > level) {
+            ulByLevel.delete(existingLevel)
+          }
+        }
+
+        if (!ulByLevel.has(level)) {
+          const parentUl = ulByLevel.get(level - 1)
+          const parentLi = parentUl?.lastElementChild
+          const childUl = document.createElement('ul')
+
+          if (parentLi) {
+            parentLi.appendChild(childUl)
+            ulByLevel.set(level, childUl)
+          } else {
+            ulByLevel.set(level, root)
+          }
+        }
+
+        const item = document.createElement('li')
+        const link = document.createElement('a')
+        link.href = `#${heading.id}`
+        link.textContent = heading.text
+        item.appendChild(link)
+        ulByLevel.get(level).appendChild(item)
+      })
+
+      return root
+    }
+
+    function renderTOC() {
+      const headings = collectArticleHeadings()
+      const tocList = buildTOCList(headings)
+
+      document.querySelectorAll(TOC_NAV_SELECTOR).forEach(nav => {
+        nav.replaceChildren(tocList.cloneNode(true))
+      })
+    }
+
+    function openAncestorDetails(element) {
+      let current = element?.closest('details')
+      while (current) {
+        current.open = true
+        current = current.parentElement?.closest('details')
+      }
+    }
+
+    function revealHashTarget() {
+      if (!window.location.hash) return
+      const target = document.getElementById(window.location.hash.substring(1))
+      if (target) {
+        openAncestorDetails(target)
+      }
+    }
+
+    function getActiveAnchorId(anchors, offsetRatio) {
+      const threshold = window.scrollY + window.innerHeight * offsetRatio
+      const tocLinks = [...document.querySelectorAll('#TableOfContents a[href^="#"]')]
+      const tocIds = new Set(tocLinks.map(link => link.getAttribute('href').substring(1)))
+
+      for (let i = anchors.length - 1; i >= 0; i--) {
+        const top = anchors[i].getBoundingClientRect().top + window.scrollY
+        if (top <= threshold && tocIds.has(anchors[i].id)) {
+          return anchors[i].id
+        }
+      }
+      return anchors.find(anchor => tocIds.has(anchor.id))?.id || ''
+    }
+
+    function updateTOC({ toc, anchors, links, scrollOffset, collapseInactive }) {
+      const activeId = getActiveAnchorId(anchors, scrollOffset)
+      if (!activeId) return
+
+      links.forEach(link => {
+        const isActive = link.getAttribute('href') === `#${activeId}`
+        link.classList.toggle(ACTIVE_CLASS, isActive)
+
+        if (collapseInactive) {
+          const ul = link.closest('li')?.querySelector('ul')
+          if (ul) ul.style.display = isActive ? '' : 'none'
+        }
+      })
+
+      if (collapseInactive) {
+        const activeLink = toc.querySelector(`a[href="#${CSS.escape(activeId)}"]`)
+        let el = activeLink
+        while (el && el !== toc) {
+          if (el.tagName === 'UL') el.style.display = ''
+          if (el.tagName === 'LI') el.querySelector('ul')?.style.setProperty('display', '')
+          el = el.parentElement
+        }
+      }
+    }
+
+    function initTOC() {
+      renderTOC()
+      const toc = document.querySelector(TOC_SELECTOR)
+      if (!toc) return
+
+      const collapseInactive = {{ if site.Params.smartTOCHideUnfocusedChildren }}true{{ else }}false{{ end }}
+      const anchors = [...document.querySelectorAll(ANCHOR_SELECTOR)]
+      const links = [...toc.querySelectorAll(TOC_LINK_SELECTOR)]
+
+      if (collapseInactive) {
+        toc.querySelectorAll(NESTED_LIST_SELECTOR).forEach(ul => ul.style.display = 'none')
+      }
+
+      const config = {
+        toc,
+        anchors,
+        links,
+        scrollOffset: SCROLL_OFFSET_RATIO,
+        collapseInactive
+      }
+
+      document.querySelectorAll(TOC_NAV_SELECTOR).forEach(nav => {
+        nav.addEventListener('click', event => {
+          const link = event.target.closest('a[href^="#"]')
+          if (!link) return
+
+          const target = document.getElementById(link.getAttribute('href').substring(1))
+          if (target) {
+            openAncestorDetails(target)
+          }
+        })
+      })
+
+      window.addEventListener('scroll', () => updateTOC(config), { passive: true })
+      window.addEventListener('hashchange', () => {
+        revealHashTarget()
+        updateTOC(config)
+      }, { passive: true })
+
+      revealHashTarget()
+      updateTOC(config)
+    }
+
+    document.readyState === 'loading'
+      ? document.addEventListener('DOMContentLoaded', initTOC)
+      : initTOC()
+  })()
+</script>
+{{ end }}
