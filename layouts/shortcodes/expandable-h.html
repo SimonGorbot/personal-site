@@ -1,0 +1,46 @@
+{{- $title := "" -}}
+{{- $isOpen := false -}}
+{{- $id := "" -}}
+{{- $level := 3 -}}
+
+{{- if .IsNamedParams -}}
+  {{- $title = .Get "title" | default (.Get "summary") | default "Details" -}}
+  {{- $id = .Get "id" | default "" -}}
+  {{- $defaultOpen := .Get "defaultOpen" | default (.Get "open") -}}
+  {{- $isOpen = or (eq $defaultOpen true) (eq $defaultOpen "true") -}}
+  {{- with .Get "level" -}}
+    {{- $level = int . -}}
+  {{- end -}}
+{{- else -}}
+  {{- $title = .Get 0 | default "Details" -}}
+  {{- $id = .Get 1 | default "" -}}
+{{- end -}}
+
+{{- if lt $level 1 -}}
+  {{- $level = 1 -}}
+{{- else if gt $level 4 -}}
+  {{- $level = 4 -}}
+{{- end -}}
+
+{{- $headingTag := printf "h%d" $level -}}
+{{- .Page.Scratch.Add "bf-expandable-heading-count" 1 -}}
+{{- $headingIndex := .Page.Scratch.Get "bf-expandable-heading-count" -}}
+{{- $anchor := $id | default (printf "%s-expandable-%d" (anchorize $title) $headingIndex) -}}
+{{- $content := .Page.RenderString (dict "display" "block") .Inner -}}
+
+<details
+  class="bf-expandable-h bf-expandable-h--{{ $headingTag }}"
+  {{- if $isOpen }} open{{ end -}}>
+  <summary class="bf-expandable-h__summary">
+    <svg class="bf-expandable-h__icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M9 6l6 6-6 6"></path>
+    </svg>
+    {{- printf "<%s class=\"bf-expandable-h__title relative group\">" $headingTag | safeHTML -}}
+      {{- $title -}}
+      <div id="{{ $anchor }}" class="anchor"></div>
+    {{- printf "</%s>" $headingTag | safeHTML -}}
+  </summary>
+  <div class="bf-expandable-h__content">
+    {{- $content -}}
+  </div>
+</details>

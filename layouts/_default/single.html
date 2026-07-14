@@ -35,23 +35,15 @@
       {{ $enableToc := site.Params.article.showTableOfContents | default false }}
       {{ $enableToc = .Params.showTableOfContents | default $enableToc }}
       {{ $hasMarkdownToc := in .TableOfContents "<ul" }}
-      {{ $hasShortcodeToc := gt (.Page.Scratch.Get "bf-collapse-heading-count" | default 0) 0 }}
+      {{ $hasShortcodeToc := gt (.Page.Scratch.Get "bf-expandable-heading-count" | default 0) 0 }}
       {{ $showToc := and $enableToc (or $hasMarkdownToc $hasShortcodeToc) }}
-      {{ $showRelated := site.Params.article.showRelatedPosts | default false }}
-      {{ $topClass := cond (hasPrefix site.Params.header.layout "fixed") "lg:top-[140px]" "lg:top-10" }}
-      {{ if or $showToc $showRelated }}
+      {{ if $showToc }}
         <div class="order-first lg:ml-auto px-0 lg:order-last lg:ps-8">
-          <div class="toc ps-5 print:hidden lg:sticky {{ $topClass }}">
-            {{ if $showToc }}
-              {{ partial "toc.html" . }}
-            {{ end }}
-            {{ if $showRelated }}
-              sd
-            {{ end }}
+          <div class="toc ps-5 print:hidden">
+            {{ partial "toc.html" . }}
           </div>
         </div>
       {{ end }}
-
 
       <div class="min-w-0 min-h-0 max-w-fit">
         {{ partial "series/series.html" . }}
