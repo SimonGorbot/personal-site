@@ -43,12 +43,16 @@ html:not(.dark) #background-image+div+div {
 
   #single_header+section>.order-first.lg\:order-last {
     flex: 0 0 16rem;
+    align-self: flex-start;
     margin-left: 0;
     padding-left: 0;
+    position: sticky;
+    top: 2.5rem;
   }
 
   #single_header+section>.order-first.lg\:order-last .toc {
     padding-inline-start: 0;
+    height: fit-content;
   }
 
   #single_header+section>.min-w-0 {
@@ -58,9 +62,27 @@ html:not(.dark) #background-image+div+div {
   #single_header+section .article-content {
     max-width: 60rem;
   }
+
+  #single_header+section #TOCView {
+    max-height: calc(100vh - 2.5rem);
+  }
 }
 
-.bf-collapse {
+.toc a.active,
+.toc a[aria-current="true"] {
+  color: rgba(var(--color-primary-600), 1);
+  text-decoration-line: underline;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 4px;
+}
+
+html.dark .toc a.active,
+html.dark .toc a[aria-current="true"] {
+  color: rgba(var(--color-primary-400), 1);
+}
+
+.bf-expandable-h {
   border: 0;
   box-shadow: none;
   background: transparent;
@@ -68,7 +90,7 @@ html:not(.dark) #background-image+div+div {
   margin-bottom: 0.5em;
 }
 
-.bf-collapse__summary {
+.bf-expandable-h__summary {
   align-items: baseline;
   cursor: pointer;
   display: inline-flex;
@@ -78,30 +100,30 @@ html:not(.dark) #background-image+div+div {
   vertical-align: top;
 }
 
-.bf-collapse__summary::-webkit-details-marker {
+.bf-expandable-h__summary::-webkit-details-marker {
   display: none;
 }
 
-.bf-collapse__summary::marker {
+.bf-expandable-h__summary::marker {
   content: "";
 }
 
-.bf-collapse__summary:focus-visible {
+.bf-expandable-h__summary:focus-visible {
   outline: 2px solid rgba(var(--color-primary-500), 1);
   outline-offset: 4px;
 }
 
-.bf-collapse__title {
+.bf-expandable-h__title {
   margin: 0;
 }
 
-.bf-collapse__icon {
+.bf-expandable-h__icon {
   display: inline-flex;
   flex: 0 0 auto;
   height: 1em;
   overflow: visible;
   position: relative;
-  top: 0.20em;
+  top: 0.2em;
   transition:
     color 160ms ease,
     transform 160ms ease;
@@ -109,21 +131,17 @@ html:not(.dark) #background-image+div+div {
   color: var(--tw-prose-headings);
 }
 
-html.dark .bf-collapse__icon {
-  color: var(--tw-prose-headings);
-}
-
-.bf-collapse__icon:hover,
-.bf-collapse__summary:focus-visible .bf-collapse__icon {
+.bf-expandable-h__icon:hover,
+.bf-expandable-h__summary:focus-visible .bf-expandable-h__icon {
   color: rgba(var(--color-primary-600), 1);
 }
 
-html.dark .bf-collapse__summary:focus-visible .bf-collapse__icon,
-html.dark .bf-collapse__icon:hover {
+html.dark .bf-expandable-h__summary:focus-visible .bf-expandable-h__icon,
+html.dark .bf-expandable-h__icon:hover {
   color: rgba(var(--color-primary-400), 1);
 }
 
-.bf-collapse__icon path {
+.bf-expandable-h__icon path {
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
@@ -131,74 +149,70 @@ html.dark .bf-collapse__icon:hover {
   stroke-width: 2.25;
 }
 
-.bf-collapse[open] .bf-collapse__icon {
+.bf-expandable-h[open] > .bf-expandable-h__summary .bf-expandable-h__icon {
   transform: rotate(90deg);
 }
 
-.bf-collapse__content {
+.bf-expandable-h__content {
   padding-top: 0.5em;
 }
 
-.bf-collapse__content> :first-child {
+.bf-expandable-h__content > :first-child {
   margin-top: 0;
 }
 
-.bf-collapse__content> :last-child {
+.bf-expandable-h__content > :last-child {
   margin-bottom: 0;
 }
 
-.bf-collapse--h1 .bf-collapse__icon {
+.bf-expandable-h--h1 .bf-expandable-h__icon {
   height: 2.25rem;
   width: 2.25rem;
 }
 
-.bf-collapse--h1 {
+.bf-expandable-h--h1 {
   margin-top: 0;
   margin-bottom: 0.8888889em;
 }
 
-.bf-collapse--h2 .bf-collapse__icon {
+.bf-expandable-h--h2 .bf-expandable-h__icon {
   height: 1.5rem;
   width: 1.5rem;
 }
 
-.bf-collapse--h2 {
+.bf-expandable-h--h2 {
   margin-top: 2em;
   margin-bottom: 1em;
 }
 
-.bf-collapse--h3 .bf-collapse__icon {
+.bf-expandable-h--h3 .bf-expandable-h__icon {
   height: 1.25rem;
   width: 1.25rem;
 }
 
-.bf-collapse--h3 {
+.bf-expandable-h--h3 {
   margin-top: 1.6em;
   margin-bottom: 0.6em;
 }
 
-.bf-collapse--h4 .bf-collapse__icon,
-.bf-collapse--h5 .bf-collapse__icon,
-.bf-collapse--h6 .bf-collapse__icon {
+.bf-expandable-h--h4 .bf-expandable-h__icon {
   height: 1rem;
   width: 1rem;
 }
 
-.bf-collapse--h4,
-.bf-collapse--h5,
-.bf-collapse--h6 {
+.bf-expandable-h--h4 {
   margin-top: 1.5em;
   margin-bottom: 0.5em;
 }
 
-.bf-collapse--h1 .bf-collapse__content {
+.bf-expandable-h--h1 .bf-expandable-h__content {
   padding-top: 0.8888889em;
 }
 
-.bf-collapse--h2 .bf-collapse__content {
+.bf-expandable-h--h2 .bf-expandable-h__content {
   padding-top: 1em;
 }
 
-.bf-collapse--h3 .bf-collapse__content {
+.bf-expandable-h--h3 .bf-expandable-h__content {
   padding-top: 0.6em;
 }

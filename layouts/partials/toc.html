@@ -1,6 +1,11 @@
+{{ $hasExpandableHeadings := gt (.Page.Scratch.Get "bf-expandable-heading-count" | default 0) 0 }}
 {{ $toc := .TableOfContents | emojify }}
-{{ if not (in $toc "<nav") }}
+{{ $tocMarkup := .TableOfContents | emojify }}
+{{ if and $hasExpandableHeadings (not (in $toc "<nav")) }}
   {{ $toc = "<nav id=\"TableOfContents\"></nav>" }}
+  {{ $tocMarkup = $toc | safeHTML }}
+{{ else if $hasExpandableHeadings }}
+  {{ $tocMarkup = $toc | safeHTML }}
 {{ end }}
 <details
   open
@@ -12,7 +17,7 @@
   </summary>
   <div
     class="min-w-[220px] py-2 border-dotted border-s-1 -ms-5 ps-5 dark:border-neutral-600">
-    {{ $toc | safeHTML }}
+    {{ $tocMarkup }}
   </div>
 </details>
 <details class="toc-inside mt-0 overflow-hidden rounded-lg -ms-5 ps-5 lg:hidden">
@@ -22,7 +27,7 @@
   </summary>
   <div
     class="py-2 border-dotted border-neutral-300 border-s-1 -ms-5 ps-5 dark:border-neutral-600">
-    {{ $toc | safeHTML }}
+    {{ $tocMarkup }}
   </div>
 </details>
 
@@ -31,14 +36,71 @@
   (function () {
     'use strict'
 
+    const HAS_EXPANDABLE_HEADINGS = {{ if $hasExpandableHeadings }}true{{ else }}false{{ end }}
     const SCROLL_OFFSET_RATIO = 0.33
     const TOC_SELECTOR = '#TableOfContents'
-    const TOC_NAV_SELECTOR = 'nav#TableOfContents'
     const ANCHOR_SELECTOR = '.anchor'
     const TOC_LINK_SELECTOR = 'a[href^="#"]'
     const NESTED_LIST_SELECTOR = 'li ul'
-    const ARTICLE_HEADING_SELECTOR = '.article-content h1, .article-content h2, .article-content h3, .article-content h4, .article-content h5, .article-content h6'
     const ACTIVE_CLASS = 'active'
+
+    function isClosedDetailsAnchor(anchor) {
+      return anchor.closest('details:not([open])') !== null
+    }
+
+    function getActiveAnchorId(anchors, offsetRatio) {
+      const threshold = window.scrollY + window.innerHeight * offsetRatio
+      const tocLinks = [...document.querySelectorAll('#TableOfContents a[href^="#"]')]
+      const tocIds = new Set(tocLinks.map(link => link.getAttribute('href').substring(1)))
+      const visibleAnchors = anchors.filter(anchor => !isClosedDetailsAnchor(anchor))
+
+      for (let i = visibleAnchors.length - 1; i >= 0; i--) {
+        const top = visibleAnchors[i].getBoundingClientRect().top + window.scrollY
+        if (top <= threshold && tocIds.has(visibleAnchors[i].id)) {
+          return visibleAnchors[i].id
+        }
+      }
+      return visibleAnchors.find(anchor => tocIds.has(anchor.id))?.id || ''
+    }
+
+    function applyActiveLinkState(activeId, { tocs, links, collapseInactive }) {
+      links.forEach(link => {
+        const isActive = link.getAttribute('href') === `#${activeId}`
+        link.classList.toggle(ACTIVE_CLASS, isActive)
+        if (isActive) {
+          link.setAttribute('aria-current', 'true')
+        } else {
+          link.removeAttribute('aria-current')
+        }
+
+        if (collapseInactive) {
+          const ul = link.closest('li')?.querySelector('ul')
+          if (ul) ul.style.display = isActive ? '' : 'none'
+        }
+      })
+
+      if (collapseInactive) {
+        tocs.forEach(toc => {
+          const activeLink = toc.querySelector(`a[href="#${CSS.escape(activeId)}"]`)
+          let el = activeLink
+          while (el && el !== toc) {
+            if (el.tagName === 'UL') el.style.display = ''
+            if (el.tagName === 'LI') el.querySelector('ul')?.style.setProperty('display', '')
+            el = el.parentElement
+          }
+        })
+      }
+    }
+
+    function updateTOC({ tocs, anchors, links, scrollOffset, collapseInactive }) {
+      const activeId = getActiveAnchorId(anchors, scrollOffset)
+      if (!activeId) return
+
+      applyActiveLinkState(activeId, { tocs, links, collapseInactive })
+    }
+
+    const TOC_NAV_SELECTOR = 'nav#TableOfContents'
+    const ARTICLE_HEADING_SELECTOR = '.article-content h1, .article-content h2, .article-content h3, .article-content h4'
 
     function getHeadingAnchor(heading) {
       return [...heading.children].find(child => child.classList?.contains('anchor')) || null
@@ -74,6 +136,7 @@
 
       headings.forEach(heading => {
         let level = heading.level - minLevel + 1
+
         while (level > 1 && !ulByLevel.has(level - 1)) {
           level -= 1
         }
@@ -109,6 +172,8 @@
     }
 
     function renderTOC() {
+      if (!HAS_EXPANDABLE_HEADINGS) return
+
       const headings = collectArticleHeadings()
       const tocList = buildTOCList(headings)
 
@@ -133,85 +198,65 @@
       }
     }
 
-    function getActiveAnchorId(anchors, offsetRatio) {
-      const threshold = window.scrollY + window.innerHeight * offsetRatio
-      const tocLinks = [...document.querySelectorAll('#TableOfContents a[href^="#"]')]
-      const tocIds = new Set(tocLinks.map(link => link.getAttribute('href').substring(1)))
-
-      for (let i = anchors.length - 1; i >= 0; i--) {
-        const top = anchors[i].getBoundingClientRect().top + window.scrollY
-        if (top <= threshold && tocIds.has(anchors[i].id)) {
-          return anchors[i].id
-        }
-      }
-      return anchors.find(anchor => tocIds.has(anchor.id))?.id || ''
-    }
-
-    function updateTOC({ toc, anchors, links, scrollOffset, collapseInactive }) {
-      const activeId = getActiveAnchorId(anchors, scrollOffset)
-      if (!activeId) return
-
-      links.forEach(link => {
-        const isActive = link.getAttribute('href') === `#${activeId}`
-        link.classList.toggle(ACTIVE_CLASS, isActive)
-
-        if (collapseInactive) {
-          const ul = link.closest('li')?.querySelector('ul')
-          if (ul) ul.style.display = isActive ? '' : 'none'
-        }
-      })
-
-      if (collapseInactive) {
-        const activeLink = toc.querySelector(`a[href="#${CSS.escape(activeId)}"]`)
-        let el = activeLink
-        while (el && el !== toc) {
-          if (el.tagName === 'UL') el.style.display = ''
-          if (el.tagName === 'LI') el.querySelector('ul')?.style.setProperty('display', '')
-          el = el.parentElement
-        }
-      }
-    }
-
     function initTOC() {
       renderTOC()
-      const toc = document.querySelector(TOC_SELECTOR)
-      if (!toc) return
+      const tocs = [...document.querySelectorAll(TOC_SELECTOR)]
+      if (!tocs.length) return
 
       const collapseInactive = {{ if site.Params.smartTOCHideUnfocusedChildren }}true{{ else }}false{{ end }}
       const anchors = [...document.querySelectorAll(ANCHOR_SELECTOR)]
-      const links = [...toc.querySelectorAll(TOC_LINK_SELECTOR)]
+      const links = tocs.flatMap(toc => [...toc.querySelectorAll(TOC_LINK_SELECTOR)])
 
       if (collapseInactive) {
-        toc.querySelectorAll(NESTED_LIST_SELECTOR).forEach(ul => ul.style.display = 'none')
+        tocs.forEach(toc => {
+          toc.querySelectorAll(NESTED_LIST_SELECTOR).forEach(ul => ul.style.display = 'none')
+        })
       }
 
       const config = {
-        toc,
+        tocs,
         anchors,
         links,
         scrollOffset: SCROLL_OFFSET_RATIO,
         collapseInactive
       }
 
-      document.querySelectorAll(TOC_NAV_SELECTOR).forEach(nav => {
-        nav.addEventListener('click', event => {
-          const link = event.target.closest('a[href^="#"]')
-          if (!link) return
+      if (HAS_EXPANDABLE_HEADINGS) {
+        document.querySelectorAll(TOC_NAV_SELECTOR).forEach(nav => {
+          nav.addEventListener('click', event => {
+            const link = event.target.closest('a[href^="#"]')
+            if (!link) return
 
-          const target = document.getElementById(link.getAttribute('href').substring(1))
-          if (target) {
-            openAncestorDetails(target)
-          }
+            const targetId = link.getAttribute('href').substring(1)
+            const target = document.getElementById(targetId)
+            if (target) {
+              openAncestorDetails(target)
+              applyActiveLinkState(targetId, config)
+              requestAnimationFrame(() => updateTOC(config))
+            }
+          })
         })
-      })
+      }
 
       window.addEventListener('scroll', () => updateTOC(config), { passive: true })
       window.addEventListener('hashchange', () => {
         revealHashTarget()
+        if (HAS_EXPANDABLE_HEADINGS) {
+          const targetId = window.location.hash.substring(1)
+          if (targetId) {
+            applyActiveLinkState(targetId, config)
+          }
+          requestAnimationFrame(() => updateTOC(config))
+          return
+        }
         updateTOC(config)
       }, { passive: true })
 
       revealHashTarget()
+      if (HAS_EXPANDABLE_HEADINGS) {
+        requestAnimationFrame(() => updateTOC(config))
+        return
+      }
       updateTOC(config)
     }
 

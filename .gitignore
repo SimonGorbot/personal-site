@@ -5,6 +5,9 @@
 .hugo_cache/
 hugo_stats.json
 
+# Local-only Hugo content used for draft shortcode testing
+content/scratch/
+
 # Tooling and OS clutter
 node_modules/
 *.log
