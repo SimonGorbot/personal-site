@@ -51,6 +51,7 @@ BananaHand is split into four major layers: mechanical design, electrical hardwa
   muted=true
   loop=true
   controls=false
+  caption="Video demo of hand teleportation (left live feed, right telemetry UI + webcam teleop feed). "
 >}}
 <!-- markdownlint-enable MD034 -->
 
@@ -112,11 +113,19 @@ That meant the electrical design could not be done in isolation. The PCB had to 
 
 I also wrote a significant portion of the firmware, especially the low-level embedded infrastructure needed to drive the actuators from Rust. For me, the most technically interesting part of that work was building a custom HAL layer for the STM32G474 HRTIM peripheral so it could be used cleanly from the Embassy-based firmware stack.
 
+![bananaHand with palm cover removed.](hand-teardown.jpg "bananaHand with palm cover removed.")
+
 ### Electrical
 
 The electrical design started from a simple requirement: the hand needed one compact board that could make the whole system usable. It had to drive the actuators, read position feedback, read tactile sensors, provide useful telemetry, communicate with a host computer, and physically fit inside the palm.
 
 During early development, breakout boards were used to validate individual circuits, evaluate component choices, and provide a flexible platform for firmware development in parallel with hardware design. These setups were never intended to represent the final architecture, but they were essential for de-risking key parts of the system before committing to a custom PCB.
+
+{{< columns >}}
+![Full hand CAD model](Front-PCBA-with-callouts.png "CAD assembly screenshot.")
+{{< column >}}
+![Finger linkage mechanism.](Back-PCBA-with-callouts.png "Finger linkage cross-section.")
+{{< endcolumns >}}
 
 #### Architecture: from distributed concept to two-MCU board
 
