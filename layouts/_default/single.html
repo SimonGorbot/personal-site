@@ -77,7 +77,7 @@
           {{ $lang := print "."  .Lang  ".md" }}
           {{ $path = replace $path $lang ".md" }}
         {{ end }}
-        {{ $jsPage := resources.Get "js/page.js" }}
+        {{ $jsPage := resources.Get "js/email.js" }}
         {{ $jsPage = $jsPage | resources.Minify | resources.Fingerprint (site.Params.fingerprintAlgorithm | default "sha512") }}
         <script
           type="text/javascript"
@@ -108,7 +108,7 @@
 {{ end }}
 
 {{ define "SingleAuthor" }}
-  {{ $authorsData := site.Data.authors }}
+  {{ $authorsData := hugo.Data.authors }}
   {{ $taxonomies := site.Taxonomies.authors }}
   {{ $baseURL := site.BaseURL }}
   {{ $taxonomyLink := 0 }}

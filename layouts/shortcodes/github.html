@@ -3,7 +3,7 @@
 {{- $githubURL := print "https://api.github.com/repos/" $repo -}}
 {{- $githubThumbnailURL := print "https://opengraph.githubassets.com/0/" $repo -}}
 {{- $showThumbnail := .Get "showThumbnail" | default true -}}
-{{- $repoColors := .Site.Data.repoColors -}}
+{{- $repoColors := hugo.Data.repoColors -}}
 {{- $githubToken := getenv "GITHUB_TOKEN" | default "" -}}
 {{- $githubHeaders := dict
   "Accept" "application/vnd.github+json"
