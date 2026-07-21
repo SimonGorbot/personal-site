@@ -12,6 +12,7 @@ description: "An open-source humanoid hand that combines proportional design, de
 ---
 
 ## Background
+
 For our final-year engineering project, my team and I built **BananaHand**, a fully open-source humanoid robotic hand designed for dexterous manipulation research. The goal was to create something more capable than a simple parallel gripper, but far more accessible than commercial anthropomorphic hands that can cost tens of thousands of dollars and are difficult to modify.
 
 The final system is a five-finger humanoid hand with 16 degrees of freedom, 6 degrees of actuation, integrated tactile sensing, a custom palm-mounted control board, Rust firmware, and a ROS 2 software stack for teleoperation and grasp selection. More importantly, the full project was built around reproducibility: the CAD, PCB files, firmware, software, BOM, and assembly resources are open-source so that future teams can build on the platform instead of starting from scratch.
@@ -43,7 +44,15 @@ At the system level, BananaHand was able to hold representative everyday objects
 
 BananaHand is split into four major layers: mechanical design, electrical hardware, embedded firmware, and high-level software. I’ll keep this section high-level, since the diagrams and photos show the architecture more clearly than a long written breakdown.
 
-![BananaHand vision based teleop UI demo](bh-demo-combined.gif "BananaHand vision based teleop demo (live video on left, UI + hand tracking on right).")
+<!-- markdownlint-disable MD034 -->
+{{< video
+  src="bh-demo-video.mp4"
+  autoplay=true
+  muted=true
+  loop=true
+  controls=false
+>}}
+<!-- markdownlint-enable MD034 -->
 
 {{< expandable-h title="Mechanical" level="3" defaultOpen="false" >}}
 
