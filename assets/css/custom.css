@@ -218,25 +218,22 @@ html.dark .bf-expandable-h__icon:hover {
 }
 
 .code-tabs {
+  --code-tabs-code-bg: #252b2e;
+  --code-tabs-code-fg: rgba(var(--color-primary-600), 1);
   display: block;
   margin-top: 1.7142857em;
   margin-bottom: 1.7142857em;
-  overflow: hidden;
   position: relative;
   z-index: 0;
-  border-radius: 0.375rem;
-  box-shadow:
-    0 1px 3px 0 rgb(0 0 0 / 0.1),
-    0 1px 2px -1px rgb(0 0 0 / 0.1);
 }
 
 .code-tabs__tablist {
-  background-color: rgba(var(--color-neutral-100), 1);
-  /* background-color: aqua; */
+  background: transparent;
+  border-bottom: 0;
   display: flex;
   gap: 0.25rem;
   overflow-x: auto;
-  padding: 0.375rem 0.5rem 0;
+  padding: 0;
   border-top-left-radius: 0.375rem;
   border-top-right-radius: 0.375rem;
 }
@@ -269,12 +266,14 @@ html.dark .bf-expandable-h__icon:hover {
 }
 
 .code-tabs__tab[aria-selected="true"] {
-  border-bottom-color: rgb(var(--color-primary-500));
-  color: rgba(var(--color-neutral-900), 1);
+  background: var(--code-tabs-code-bg);
+  border-bottom-color: var(--code-tabs-code-bg);
+  color: var(--code-tabs-code-fg);
 }
 
 .code-tabs__panel {
   display: none;
+  margin-top: -1px;
 }
 
 .code-tabs__panel.is-active {
@@ -284,16 +283,33 @@ html.dark .bf-expandable-h__icon:hover {
 .code-tabs .highlight-wrapper {
   margin-top: 0;
   margin-bottom: 0;
-  border-radius: 0;
   box-shadow: none;
 }
 
+.code-tabs .highlight-wrapper,
+.code-tabs .highlight,
+.code-tabs .highlight pre {
+  border-top-left-radius: 0.375rem;
+  border-top-right-radius: 0.375rem;
+}
+
+.code-tabs .highlight pre {
+  margin-top: 0;
+}
+
+.code-tabs:has(.code-tabs__tab:first-child[aria-selected="true"]) .highlight-wrapper,
+.code-tabs:has(.code-tabs__tab:first-child[aria-selected="true"]) .highlight,
+.code-tabs:has(.code-tabs__tab:first-child[aria-selected="true"]) .highlight pre {
+  border-top-left-radius: 0;
+}
+
 html.dark .code-tabs__tab {
+  --code-tabs-code-fg: rgba(var(--color-primary-400), 1);
   color: rgba(var(--color-neutral-300), 1);
 }
 
 html.dark .code-tabs__tablist {
-  background-color: rgba(var(--color-neutral-700), 1);
+  background: transparent;
 }
 
 html.dark .code-tabs__tab:hover {
@@ -301,5 +317,5 @@ html.dark .code-tabs__tab:hover {
 }
 
 html.dark .code-tabs__tab[aria-selected="true"] {
-  color: rgba(var(--color-neutral-50), 1);
+  color: var(--code-tabs-code-fg);
 }
