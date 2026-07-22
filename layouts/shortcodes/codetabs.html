@@ -23,6 +23,7 @@
     {{ with $group }}data-code-tabs-group="{{ . }}"{{ end }}
     {{ with $default }}data-default-tab="{{ . }}"{{ end }}>
     <div class="code-tabs__tablist codeblock-title" role="tablist" {{ with $title }}aria-label="{{ . }}"{{ else }}aria-label="Code examples"{{ end }}>
+      <span class="code-tabs__indicator" aria-hidden="true"></span>
       {{- range $index, $tab := $tabs -}}
         {{- $isActive := eq $index $activeIndex -}}
         <button
