@@ -3,7 +3,7 @@ title: "BananaHand: Open Source Anthropomorphic Robotic Hand"
 date: 2025-08-05
 type: 'project'
 
-tags: ["Rust", "KiCAD", "Robotics"]
+tags: ["Rust", "KiCAD", "Robotics", "Embedded"]
 
 weight: 5
 
@@ -40,10 +40,6 @@ The final prototype demonstrated five target grasp types: pinch, tripod, hook, c
 
 At the system level, BananaHand was able to hold representative everyday objects, sustain a textured cylindrical payload of about 5 lb, complete 100 full-power open-close cycles without visible or functional damage, and return live position, force, and current telemetry during operation.
 
-## Design Overview
-
-BananaHand is split into four major layers: mechanical design, electrical hardware, embedded firmware, and high-level software. I’ll keep this section high-level, since the diagrams and photos show the architecture more clearly than a long written breakdown.
-
 <!-- markdownlint-disable MD034 -->
 {{< video
   src="bh-demo-video.mp4"
@@ -54,6 +50,10 @@ BananaHand is split into four major layers: mechanical design, electrical hardwa
   caption="Video demo of hand teleportation (left live feed, right telemetry UI + webcam teleop feed). "
 >}}
 <!-- markdownlint-enable MD034 -->
+
+## Design Overview
+
+BananaHand is split into four major layers: mechanical design, electrical hardware, embedded firmware, and high-level software. I’ll keep this section high-level, since the diagrams and photos show the architecture more clearly than a long written breakdown.
 
 {{< expandable-h title="Mechanical" level="3" defaultOpen="false" >}}
 
@@ -91,7 +91,11 @@ On the high-level software side, the project includes two main user-facing paths
 
 The first is vision-based teleoperation. A webcam tracks a human operator’s hand, extracts hand landmarks, normalizes finger motion, and maps that motion into actuator commands for BananaHand. This gave us a lightweight control method that did not require a glove, markers, or a motion-capture system.
 
+![Vision-based teleoperation pipeline overview.](vision-based-teleoperation_white.png "Vision-based teleoperation pipeline overview.")
+
 The second is a scan-based grasp-selection pipeline. Using RGB-D data from a RealSense camera, the software reconstructs a partial point cloud of an object, removes the table plane, extracts geometric descriptors, and classifies the object into one of the supported grasp families. Instead of using a trained model, we used a rule-based geometric classifier so the decisions were interpretable and easier to debug within the project timeline.
+
+![Autonomous grasping pipeline overview.](autonomous_grasping_pipeline-compact.png "Autonomous grasping pipeline overview.")
 
 {{< /expandable-h >}}
 
@@ -102,6 +106,8 @@ The firmware is the bridge between the ROS-side software and the physical hardwa
 The final firmware is written in Rust using Embassy. There are two firmware targets: one for the STM32G474 primary controller and one for the STM32C071 sensing controller. The C0 samples 10 force-sensitive resistor channels and streams packed 12-bit readings to the G4. The G4 runs concurrent tasks for command reception, telemetry transmission, force-packet reception, position ADC sampling, current ADC sampling, and actuator control.
 
 The main control loop runs at 200 Hz. It supports both position control and force control. In position mode, commands are interpreted as actuator position targets. In force mode, commands are interpreted as force targets for channels with force feedback. In both cases, the firmware converts the controller output into motor-driver PWM commands.
+
+![Software architecture overview.](sw-arch-diag.jpg "Software architecture overview.")
 
 {{< /expandable-h >}}
 
@@ -122,12 +128,12 @@ The electrical design started from a simple requirement: the hand needed one com
 During early development, breakout boards were used to validate individual circuits, evaluate component choices, and provide a flexible platform for firmware development in parallel with hardware design. These setups were never intended to represent the final architecture, but they were essential for de-risking key parts of the system before committing to a custom PCB.
 
 {{< columns >}}
-![Full hand CAD model](Front-PCBA-with-callouts.png "CAD assembly screenshot.")
+![Front photo of PCBA labeled.](Front-PCBA-with-callouts.png "Front photo of PCBA labeled.")
 {{< column >}}
-![Finger linkage mechanism.](Back-PCBA-with-callouts.png "Finger linkage cross-section.")
+![Back photo of PCBA labeled.](Back-PCBA-with-callouts.png "Back photo of PCBA labeled.")
 {{< endcolumns >}}
 
-#### Architecture: from distributed concept to two-MCU board
+#### Architecture: two-MCU board
 
 The final architecture uses a two-MCU design that balances modularity with integration simplicity.
 
@@ -163,7 +169,7 @@ The force-sensing system uses force-sensitive resistors in the fingertips and pa
 
 That distinction mattered. FSRs are not precision load cells, and pretending otherwise would have made the design worse. For this hand, the first useful question was not “what exact force is being applied?” but “has the finger or palm made contact yet, and is the contact increasing?” A simple divider circuit was enough for that.
 
-There was also a strong practicality argument behind this choice. FSRs are by far one of the cheapest and simplest tactile sensing options available, which aligned well with the project’s goal of being accessible and reproducible. More advanced approaches, like Hall-effect-based sensing, would have been very interesting from a performance standpoint, but they introduce significant additional complexity across electrical design, mechanical integration, and firmware. Implementing that kind of system properly could easily become a full capstone project on its own.
+There was also a strong practicality argument behind this choice. FSRs are by far one of the cheapest and simplest tactile sensing options available, which aligned well with the project’s goal of being accessible and reproducible. More advanced approaches, like [Hall-effect-based sensing](https://shadowrobot.com/sensors/), would have been very interesting from a performance standpoint, but they introduce significant additional complexity across electrical design, mechanical integration, and firmware. Implementing that kind of system properly could easily become a full capstone project on its own.
 
 The outcome matched the goal. In testing, the system detected fingertip activation around 16 g and palm activation around 10 g. Those values were sensitive enough for early contact detection and met the tactile-sensing needs of the MVP. The palm being slightly more sensitive also made practical sense during grasping, since larger objects often contact the palm before the fingertips fully close.
 
@@ -209,6 +215,30 @@ Embassy gave us an async embedded framework that fit the structure of the proble
 
 The tradeoff was that some lower-level STM32G4 peripheral support was not available in the form we needed. That became most obvious with the HRTIM peripheral, which is why I ended up writing a custom HAL layer.
 
+#### Custom HRTIM HAL
+
+The most technically interesting firmware work I did was writing a custom HAL for the STM32G474 HRTIM peripheral.
+
+The hand needed many PWM outputs for the motor drivers. The STM32G474 has a high-resolution timer peripheral that is well suited to this kind of motor-control workload, but the Embassy HAL did not expose the HRTIM functionality we needed in a clean way at the time. The hardware capability was there, but the software abstraction was missing.
+
+So I wrote a small `no_std` HAL crate that exposed HRTIM subtimers as PWM-capable handles that could be used from the rest of the Embassy firmware.
+
+At a high level, the HAL handles:
+
+* enabling the HRTIM peripheral
+* configuring subtimers A through F
+* calculating period register values from the system clock, APB prescaler, HRTIM prescaler, and desired PWM frequency
+* setting up GPIO pins in the correct alternate-function mode
+* enabling individual HRTIM outputs
+* setting PWM duty cycle by percentage
+* returning typed PWM handles for each configured subtimer/channel pair
+
+The design uses Rust’s type system to represent which subtimers and channels have been configured. Instead of passing around loosely defined channel numbers, the firmware gets concrete PWM handles for the configured outputs. That made the board mapping code cleaner and reduced the chance of mixing up channels accidentally.
+
+In the final firmware, the HRTIM outputs are mapped directly to the actuator motor-driver inputs for most of the hand. TIM1 is also used for the thumb opposition channel, while the HRTIM subtimers drive the other actuator channels.
+
+This was a good example of embedded work sitting right between software and hardware. The PCB exposed the right timer-capable pins. The STM32G474 had the right peripheral. The firmware architecture needed clean PWM objects. The missing piece was a small abstraction layer that connected all three.
+
 #### Firmware partitioning between the G4 and C0
 
 The STM32C071 firmware is intentionally simple. It samples 10 FSR channels at 200 Hz, packs the 12-bit ADC readings into a compact packet, adds a checksum, and sends the result to the STM32G474 over UART.
@@ -246,30 +276,6 @@ In force mode, the host sends force targets. The firmware reads force data from 
 One design choice I like is that commands are treated as targets, not direct motor outputs. The host does not tell the motor drivers what duty cycle to use. It tells the hand what state it wants, and the firmware decides how to drive the actuators based on feedback. That makes the firmware the correct boundary between high-level intent and hardware behaviour.
 
 The motor-command layer maps controller output into four meaningful driver states: move in, move out, brake, and coast. That abstraction made the control code easier to reason about and also gave us safer behaviour during mode changes. For example, when switching control modes, the firmware waits for a fresh command before applying outputs, rather than blindly reusing stale command data from the previous mode.
-
-#### Custom HRTIM HAL
-
-The most technically interesting firmware work I did was writing a custom HAL for the STM32G474 HRTIM peripheral.
-
-The hand needed many PWM outputs for the motor drivers. The STM32G474 has a high-resolution timer peripheral that is well suited to this kind of motor-control workload, but the Embassy HAL did not expose the HRTIM functionality we needed in a clean way at the time. The hardware capability was there, but the software abstraction was missing.
-
-So I wrote a small `no_std` HAL crate that exposed HRTIM subtimers as PWM-capable handles that could be used from the rest of the Embassy firmware.
-
-At a high level, the HAL handles:
-
-* enabling the HRTIM peripheral
-* configuring subtimers A through F
-* calculating period register values from the system clock, APB prescaler, HRTIM prescaler, and desired PWM frequency
-* setting up GPIO pins in the correct alternate-function mode
-* enabling individual HRTIM outputs
-* setting PWM duty cycle by percentage
-* returning typed PWM handles for each configured subtimer/channel pair
-
-The design uses Rust’s type system to represent which subtimers and channels have been configured. Instead of passing around loosely defined channel numbers, the firmware gets concrete PWM handles for the configured outputs. That made the board mapping code cleaner and reduced the chance of mixing up channels accidentally.
-
-In the final firmware, the HRTIM outputs are mapped directly to the actuator motor-driver inputs for most of the hand. TIM1 is also used for the thumb opposition channel, while the HRTIM subtimers drive the other actuator channels.
-
-This was a good example of embedded work sitting right between software and hardware. The PCB exposed the right timer-capable pins. The STM32G474 had the right peripheral. The firmware architecture needed clean PWM objects. The missing piece was a small abstraction layer that connected all three.
 
 #### Board mapping as a firmware boundary
 
