@@ -1,0 +1,22 @@
+{{- $label := or (.Get "label") (.Get "title") (.Get 0) -}}
+{{- $lang := or (.Get "lang") (.Get "language") (.Get "type") (.Get 1) "text" -}}
+{{- $key := or (.Get "key") $label -}}
+{{- $options := .Get "options" | default "" -}}
+{{- $code := .InnerDeindent | strings.TrimSpace -}}
+
+{{- if strings.HasPrefix $code "```" -}}
+  {{- $fenceLang := replaceRE "(?s)^```([A-Za-z0-9_+.-]+).*$" "$1" $code -}}
+  {{- if and (not (.Get "lang")) (not (.Get "language")) (not (.Get "type")) (ne $fenceLang $code) -}}
+    {{- $lang = $fenceLang -}}
+  {{- end -}}
+  {{- $code = replaceRE "(?s)^```[A-Za-z0-9_+.-]*[^\\n]*\\n(.*)\\n```[ \\t\\r\\n]*$" "$1" $code -}}
+{{- end -}}
+
+{{- if not $label -}}
+  {{- $label = $lang | strings.FirstUpper -}}
+  {{- $key = $label -}}
+{{- end -}}
+
+{{- $highlighted := transform.Highlight $code $lang $options -}}
+{{- $tabs := .Parent.Store.Get "code-tabs" | default slice -}}
+{{- .Parent.Store.Set "code-tabs" ($tabs | append (dict "label" $label "lang" $lang "key" $key "content" $highlighted)) -}}
