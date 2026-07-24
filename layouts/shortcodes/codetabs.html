@@ -1,0 +1,58 @@
+{{- $noop := .Inner -}}
+{{- $tabs := .Store.Get "code-tabs" | default slice -}}
+{{- $id := printf "code-tabs-%s" (partial "functions/uid.html" .) -}}
+{{- $group := or (.Get "group") (.Get "groupid") -}}
+{{- $default := .Get "default" -}}
+{{- $title := .Get "title" -}}
+{{- $activeIndex := 0 -}}
+{{- if $default -}}
+  {{- range $index, $tab := $tabs -}}
+    {{- if or (eq $default (index $tab "label")) (eq $default (index $tab "key")) -}}
+      {{- $activeIndex = $index -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if not $tabs -}}
+  {{- warnf "codetabs shortcode has no codetab children: %s" .Position -}}
+{{- else -}}
+  <div
+    id="{{ $id }}"
+    class="code-tabs"
+    data-code-tabs
+    {{ with $group }}data-code-tabs-group="{{ . }}"{{ end }}
+    {{ with $default }}data-default-tab="{{ . }}"{{ end }}>
+    <div class="code-tabs__tablist codeblock-title" role="tablist" {{ with $title }}aria-label="{{ . }}"{{ else }}aria-label="Code examples"{{ end }}>
+      <span class="code-tabs__indicator" aria-hidden="true"></span>
+      {{- range $index, $tab := $tabs -}}
+        {{- $isActive := eq $index $activeIndex -}}
+        <button
+          id="{{ $id }}-tab-{{ $index }}"
+          class="code-tabs__tab"
+          type="button"
+          role="tab"
+          aria-selected="{{ cond $isActive `true` `false` }}"
+          aria-controls="{{ $id }}-panel-{{ $index }}"
+          data-code-tab-index="{{ $index }}"
+          data-code-tab-key="{{ index $tab "key" }}">
+          {{- index $tab "label" -}}
+        </button>
+      {{- end -}}
+    </div>
+    <div class="code-tabs__panels">
+      {{- range $index, $tab := $tabs -}}
+        {{- $isActive := eq $index $activeIndex -}}
+        <div
+          id="{{ $id }}-panel-{{ $index }}"
+          class="code-tabs__panel{{ if $isActive }} is-active{{ end }}"
+          role="tabpanel"
+          aria-labelledby="{{ $id }}-tab-{{ $index }}"
+          data-code-tab-index="{{ $index }}">
+          <div class="highlight-wrapper">
+            {{- index $tab "content" | safeHTML -}}
+          </div>
+        </div>
+      {{- end -}}
+    </div>
+  </div>
+{{- end -}}

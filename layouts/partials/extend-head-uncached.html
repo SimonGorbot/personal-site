@@ -1,0 +1,4 @@
+{{- if .HasShortcode "codetabs" -}}
+  {{- $codeTabsJS := resources.Get "js/shortcodes/code-tabs.js" | resources.Minify | resources.Fingerprint (.Site.Params.fingerprintAlgorithm | default "sha512") -}}
+  <script defer src="{{ $codeTabsJS.RelPermalink }}" integrity="{{ $codeTabsJS.Data.Integrity }}"></script>
+{{- end -}}
